@@ -78,14 +78,21 @@ function Account() {
           >
             Connect Wallet
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+            }}
+          >
             {connectors.map(({ title, icon, connectorId }, key) => (
               <div
                 style={styles.connector}
                 key={key}
                 onClick={async () => {
                   try {
-                    await authenticate({ provider: connectorId });
+                    await authenticate({
+                      provider: connectorId,
+                    });
                     window.localStorage.setItem("connectorId", connectorId);
                     setIsAuthModalVisible(false);
                   } catch (e) {

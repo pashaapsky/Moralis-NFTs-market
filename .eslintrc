@@ -15,7 +15,8 @@
     "plugin:react/jsx-runtime",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+    "react-app"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -24,11 +25,13 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react"],
+  "plugins": ["react", "react-hooks"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
     "react/jsx-key": "off",
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    "no-unused-vars": "warn",
+    "indent": ["error", 2]
   }
 }

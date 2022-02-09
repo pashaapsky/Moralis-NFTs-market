@@ -190,7 +190,11 @@ function DEX({ chain, customTokens = {} }) {
           bodyStyle={{ padding: "0.8rem" }}
         >
           <div
-            style={{ marginBottom: "5px", fontSize: "14px", color: "#434343" }}
+            style={{
+              marginBottom: "5px",
+              fontSize: "14px",
+              color: "#434343",
+            }}
           >
             From
           </div>
@@ -247,7 +251,11 @@ function DEX({ chain, customTokens = {} }) {
           </div>
         </Card>
         <div
-          style={{ display: "flex", justifyContent: "center", padding: "10px" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "10px",
+          }}
         >
           <ArrowDownOutlined />
         </div>
@@ -256,7 +264,11 @@ function DEX({ chain, customTokens = {} }) {
           bodyStyle={{ padding: "0.8rem" }}
         >
           <div
-            style={{ marginBottom: "5px", fontSize: "14px", color: "#434343" }}
+            style={{
+              marginBottom: "5px",
+              fontSize: "14px",
+              color: "#434343",
+            }}
           >
             To
           </div>

@@ -14,7 +14,7 @@ export const useERC20Transfers = () => {
 
   const fetchERC20Transfers = async () => {
     return await account
-      .getTokenTransfers({ address: walletAddress, chain: chainId })
+      .getTokenTransfers({ chain: chainId, address: walletAddress })
       .then((result) => result.result);
   };
   return { fetchERC20Transfers, ERC20Transfers, chainId };

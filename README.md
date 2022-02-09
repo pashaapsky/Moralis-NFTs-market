@@ -715,7 +715,9 @@ const TokenPrice = () => {
       {error && <>{JSON.stringify(error)}</>}
       <button
         onClick={() =>
-          fetchTokenPrice({ params: { address: "0x6...361", chain: "bsc" } })
+          fetchTokenPrice({
+            params: { address: "0x6...361", chain: "bsc" },
+          })
         }
       >
         Refetch

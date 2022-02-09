@@ -13,15 +13,29 @@ export const useVerifyMetadata = () => {
   /**
    * Fet Metadata  from NFT and Cache Results
    * @param {object} NFT
-   * @returns NFT
+   * @returns Object
    */
   function verifyMetadata(NFT) {
     //Pass Through if Metadata already present
-    if (NFT.metadata) return NFT;
-    //Get the Metadata
-    getMetadata(NFT);
-    //Return Hooked NFT Object
-    return results?.[NFT.token_uri] ? results?.[NFT.token_uri] : NFT;
+    try {
+      if (NFT.metadata) {
+        return {
+          ...NFT,
+          metadata: {
+            ...JSON.parse(NFT.metadata),
+            image: resolveLink(JSON.parse(NFT.metadata).image),
+          },
+        };
+      }
+
+      //Get the Metadata
+      getMetadata(NFT);
+      //Return Hooked NFT Object
+      return results?.[NFT.token_uri] ? results?.[NFT.token_uri] : NFT;
+    } catch (e) {
+      console.error(e.message);
+      return NFT;
+    }
   } //verifyMetadata()
 
   /**
@@ -33,7 +47,11 @@ export const useVerifyMetadata = () => {
   async function getMetadata(NFT) {
     //Validate URI
     if (!NFT.token_uri || !NFT.token_uri.includes("://")) {
-      console.log("getMetadata() Invalid URI", { URI: NFT.token_uri, NFT });
+      console.log("getMetadata() Invalid URI", {
+        URI: NFT.token_uri,
+        NFT,
+      });
+
       return;
     }
     //Get Metadata

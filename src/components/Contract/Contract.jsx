@@ -108,7 +108,10 @@ export default function Contract() {
                 tx.on("transactionHash", (hash) => {
                   setResponses({
                     ...responses,
-                    [name]: { result: null, isLoading: true },
+                    [name]: {
+                      result: null,
+                      isLoading: true,
+                    },
                   });
                   openNotification({
                     message: "🔊 New Transaction",
@@ -119,7 +122,10 @@ export default function Contract() {
                   .on("receipt", (receipt) => {
                     setResponses({
                       ...responses,
-                      [name]: { result: null, isLoading: false },
+                      [name]: {
+                        result: null,
+                        isLoading: false,
+                      },
                     });
                     openNotification({
                       message: "📃 New Receipt",
@@ -135,7 +141,10 @@ export default function Contract() {
                 Moralis.executeFunction(options).then((response) =>
                   setResponses({
                     ...responses,
-                    [name]: { result: response, isLoading: false },
+                    [name]: {
+                      result: response,
+                      isLoading: false,
+                    },
                   }),
                 );
               }
