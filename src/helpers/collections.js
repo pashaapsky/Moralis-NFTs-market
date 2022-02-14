@@ -1,19 +1,19 @@
 export const networkCollections = {
-  "0x13881": [
-    //Add Your Collections here
-    {
-      image:
-        "https://lh3.googleusercontent.com/BWCni9INm--eqCK800BbRkL10zGyflxfPwTHt4XphMSWG3XZvPx1JyGdfU9vSor8K046DJg-Q8Y4ioUlWHiCZqgR_L00w4vcbA-w=s0",
-      name: "Test Mages",
-      addrs: "0x275d553f426355c20b134D944B5b28D31CDb83DA",
-    },
-    {
-      image:
-        "https://ipfs.moralis.io:2053/ipfs/QmfLbpeVHxReWKNLaXTPcWiafi49eoAL4gRwMGuXtx2Eqe/images/14.png",
-      name: "Pixel Show",
-      addrs: "0xCA34404dD8Bd6537BE76F3A51B379F8949bD7973",
-    },
-  ],
+  // "0x13881": [
+  //   //Add Your Collections here
+  //   {
+  //     image:
+  //       "https://lh3.googleusercontent.com/BWCni9INm--eqCK800BbRkL10zGyflxfPwTHt4XphMSWG3XZvPx1JyGdfU9vSor8K046DJg-Q8Y4ioUlWHiCZqgR_L00w4vcbA-w=s0",
+  //     name: "Test Mages",
+  //     address: "0x275d553f426355c20b134D944B5b28D31CDb83DA",
+  //   },
+  //   {
+  //     image:
+  //       "https://ipfs.moralis.io:2053/ipfs/QmfLbpeVHxReWKNLaXTPcWiafi49eoAL4gRwMGuXtx2Eqe/images/14.png",
+  //     name: "Pixel Show",
+  //     address: "0xCA34404dD8Bd6537BE76F3A51B379F8949bD7973",
+  //   },
+  // ],
   "0x4": [
     //Add Your Collections here
     {
@@ -21,6 +21,18 @@ export const networkCollections = {
         "https://lh3.googleusercontent.com/dIF1KNArp7Yb79xZYZ4qbiY9qo4IkYXmK10NlN1CDAgQEtTox1kmrt1r9kKQD4m8c2yOcXEOh8mGydzEJhlxv5lyPmG2Nah04CSp6w=h200",
       name: "CloneX",
       address: "0x3eC9C3cB29Ed95A396A48a4fBDb6b8546d001D5A",
+    },
+    {
+      image:
+        "https://lh3.googleusercontent.com/rNuVWMFSBxkS0p9i03CpEtlPPVNSfmz4UP5KIiZvmTNzuuktwwJJM3LT6P0HiVHfX8MX55cW7JMZ6TbQlK5gwQBYrTHkhZOJaTvU=w600",
+      name: "APSKY DOGS V2",
+      address: "0x0541b5b0fd08f7ed4dcbe173dac6133cf6ad1a1d",
+    },
+    {
+      image:
+        "https://lh3.googleusercontent.com/kGchAUVRJEAP_C35CL8QJg6mBYxHrdo534lVWtAqMk1BCFctYSQcbAwo5_jCwc8gqHHxXpMy0t7YvvOIdBi_nRKpjtuivE9HmUXygX8=w600",
+      name: "APSKY DOGS",
+      address: "0x86cD435864A9De28c8E56e74Ad71D51c970181D7",
     },
     {
       image:

@@ -8,14 +8,15 @@ import {
 } from "react-router-dom";
 import Account from "components/Account/Account";
 import Chains from "components/Chains";
-import NFTBalance from "components/NFTBalance";
+import NFTCollection from "components/NFTCollection";
 import { Layout } from "antd";
 import "antd/dist/antd.css";
 import NativeBalance from "components/NativeBalance";
 import "./style.css";
 import MenuItems from "./components/MenuItems";
-import NFTTokenIds from "./components/NFTTokenIds";
+import NFTExplore from "./components/NFTExplore";
 import SearchCollections from "./components/SearchCollections";
+import Transactions from "./components/Transactions";
 const { Header } = Layout;
 
 const styles = {
@@ -48,14 +49,10 @@ const styles = {
     fontWeight: "600",
   },
 };
+
 const App = () => {
-  const {
-    isWeb3Enabled,
-    enableWeb3,
-    isAuthenticated,
-    isWeb3EnableLoading,
-    chainId,
-  } = useMoralis();
+  const { isWeb3Enabled, enableWeb3, isAuthenticated, isWeb3EnableLoading } =
+    useMoralis();
 
   const [tokensCollectionAddress, setTokensCollectionAddress] = useState("");
 
@@ -64,8 +61,7 @@ const App = () => {
 
     if (isAuthenticated && !isWeb3Enabled && !isWeb3EnableLoading)
       enableWeb3({ provider: connectorId });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, isWeb3Enabled]);
+  }, [isAuthenticated, isWeb3Enabled, enableWeb3, isWeb3EnableLoading]);
 
   return (
     <Layout style={{ height: "100vh", overflow: "auto" }}>
@@ -88,19 +84,19 @@ const App = () => {
 
         <div style={styles.content}>
           <Switch>
-            <Route exact path="/nftMarket">
-              <NFTTokenIds
+            <Route exact path="/explore">
+              <NFTExplore
                 setTokensCollectionAddress={setTokensCollectionAddress}
                 tokensCollectionAddress={tokensCollectionAddress}
               />
             </Route>
 
-            <Route exact path="/nftBalance">
-              <NFTBalance />
+            <Route exact path="/collection">
+              <NFTCollection />
             </Route>
 
             <Route exact path="/transactions">
-              {/*<Transactions />*/}
+              <Transactions />
             </Route>
 
             <Redirect to="/nftBalance" />

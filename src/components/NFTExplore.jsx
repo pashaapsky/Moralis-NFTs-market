@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useMoralis, useNFTBalances } from "react-moralis";
-import { Card, Image, Tooltip, Modal, Input, Skeleton } from "antd";
+import {
+  useMoralis,
+  useMoralisQuery,
+  useWeb3ExecuteFunction,
+} from "react-moralis";
+import { Card, Image, Tooltip, Modal, Badge, Skeleton, Alert } from "antd";
 import { FileSearchOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { getExplorer } from "helpers/networks";
 import { useVerifyMetadata } from "hooks/useVerifyMetadata";
-import { useNFTTokenIds } from "../hooks/useNFTTokenIds";
-import { networkCollections } from "../helpers/collections";
-import AddressInput from "./AddressInput";
-import Moralis from "moralis";
+import { useNFTTokenIds } from "hooks/useNFTTokenIds";
+import { networkCollections } from "helpers/collections";
+import { getNativeByChain } from "helpers/networks";
+import MoralisNFTMarketJson from "contracts/MoralisNFTMarket.json";
+import useQueryMarketItems from "../hooks/useQueryMarketItems";
+import ERC721 from "../contracts/ERC721.json";
 
 const styles = {
   NFTs: {
@@ -23,43 +29,121 @@ const styles = {
 };
 
 const { Meta } = Card;
+const { ethereum } = window;
 
-function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
+function NFTExplore({ tokensCollectionAddress, setTokensCollectionAddress }) {
   const [visible, setVisibility] = useState(false);
   const [nftToBuy, setNftToBuy] = useState(null);
   const [isPending, setIsPending] = useState(false);
   const { NFTTokenIds, isLoading } = useNFTTokenIds(tokensCollectionAddress);
-  const { chainId } = useMoralis();
+  const { chainId, Moralis, account } = useMoralis();
   const { verifyMetadata } = useVerifyMetadata();
+  const nativeNetworkName = getNativeByChain(chainId);
+  const ethers = Moralis.web3Library;
+  const MoralisNFTMarket = useWeb3ExecuteFunction();
+  const { queryMarketItems } = useQueryMarketItems();
+  // const queryMarketItems = useMoralisQuery("CreatedMarketItems");
 
-  const handleBuyToken = (nft) => {
+  useEffect(() => {}, []);
+
+  // const fetchMarketItems = JSON.parse(
+  //   JSON.stringify(queryMarketItems.data, [
+  //     "objectID",
+  //     "createdAt",
+  //     "price",
+  //     "nftContract",
+  //     "itemId",
+  //     "sold",
+  //     "tokenId",
+  //     "seller",
+  //     "owner",
+  //     "confirmed",
+  //   ]),
+  // );
+
+  console.log("queryMarketItems: ", queryMarketItems);
+
+  const getMarketItem = (nft) => {
+    return queryMarketItems.find(
+      (item) =>
+        item.nftContract.toLowerCase() === nft?.token_address.toLowerCase() &&
+        item.tokenId === nft?.token_id,
+    );
+  };
+
+  const handleStartBuyToken = (nft) => {
+    const item = getMarketItem(nft);
+
     setNftToBuy(nft);
     setVisibility(true);
   };
 
-  async function transfer(nft, amount, receiver) {
-    const options = {
-      type: nft?.contract_type?.toLowerCase(),
-      tokenId: nft?.token_id,
-      receiver,
-      contractAddress: nft?.token_address,
-    };
+  const updateSoldMarketItem = async () => {
+    const id = getMarketItem(nftToBuy).objectId;
+    const marketList = Moralis.Object.extend("CreatedMarketItems");
+    const query = new Moralis.Query(marketList);
 
-    if (options.type === "erc1155") {
-      options.amount = amount ?? nft.amount;
-    }
+    await query.get(id).then((item) => {
+      item.set("sold", true);
+      item.set("owner", account);
+      item.save();
+    });
+  };
 
-    setIsPending(true);
+  const handleConfirmBuyToken = async () => {
+    const tokenToBuy = getMarketItem(nftToBuy);
 
-    try {
-      const tx = await Moralis.transfer(options);
-      console.log(tx);
-      setIsPending(false);
-    } catch (e) {
-      alert(e.message);
-      setIsPending(false);
-    }
-  }
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const MoralisNFTMarketContract = new ethers.Contract(
+      MoralisNFTMarketJson.address,
+      MoralisNFTMarketJson.abi,
+      signer,
+    );
+
+    const createTx = await MoralisNFTMarketContract.createMarketSale(
+      tokenToBuy.nftContract,
+      tokenToBuy.itemId,
+      { value: ethers.utils.parseUnits(tokenToBuy.price, "ether") },
+    );
+
+    await createTx.wait();
+
+    console.log("createTx: ", createTx);
+
+    // const ERC721Contract = new ethers.Contract(
+    //   nft.token_address,
+    //   ERC721.abi,
+    //   signer,
+    // );
+
+    // const approveTx = await ERC721Contract.approve(account, nft.token_id);
+    // await approveTx.wait();
+
+    // console.log("approveTx: ", approveTx);
+
+    // const options = {
+    //   abi: MoralisNFTMarketJson.abi,
+    //   contractAddress: MoralisNFTMarketJson.address,
+    //   functionName: "createMarketSale",
+    //   params: {
+    //     nftContract: nft.token_address,
+    //     itemId: nft.token_id,
+    //   },
+    // };
+    //
+    // const res = await MoralisNFTMarket.fetch({
+    //   params: options,
+    //   onSuccess: () => {
+    //     alert("Item bought");
+    //     updateSoldMarketItem();
+    //   },
+    //   onError: (error) => {
+    //     alert(`something went wrong: ${error}`);
+    //     console.error(error);
+    //   },
+    // });
+  };
 
   const pageTitle = tokensCollectionAddress
     ? "NFT MARKET PLACE"
@@ -69,9 +153,7 @@ function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
     return () => {
       setTokensCollectionAddress("");
     };
-  }, []);
-
-  console.log("");
+  }, [setTokensCollectionAddress]);
 
   return (
     <>
@@ -103,7 +185,7 @@ function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
                         </Tooltip>,
                         <Tooltip title="Buy this NFT">
                           <ShoppingCartOutlined
-                            onClick={() => handleBuyToken(nft)}
+                            onClick={() => handleStartBuyToken(nft)}
                           />
                         </Tooltip>,
                       ]}
@@ -122,7 +204,10 @@ function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
                       }
                       key={index}
                     >
-                      <Meta title={nft.name} description={nft.token_address} />
+                      {getMarketItem(nft) && (
+                        <Badge.Ribbon text="Buy now" color="green" />
+                      )}
+                      <Meta title={nft.name} description={`#${nft.token_id}`} />
                     </Card>
                   );
                 })}
@@ -159,10 +244,7 @@ function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
                       }
                       key={index}
                     >
-                      <Meta
-                        title={item.name}
-                        // description={item.token_address}
-                      />
+                      <Meta title={item.name} />
                     </Card>
                   );
                 })}
@@ -172,27 +254,57 @@ function NFTTokenIds({ tokensCollectionAddress, setTokensCollectionAddress }) {
         </div>
       </div>
 
-      <Modal
-        title={`Buy ${nftToBuy?.name || "NFT"}`}
-        visible={visible}
-        onCancel={() => setVisibility(false)}
-        onOk={() => alert("bought this nft")}
-        confirmLoading={isPending}
-        okText="Buy"
-      >
-        <img
-          style={{
-            width: "250px",
-            margin: "auto",
-            borderRadius: "10px",
-            marginBottom: "15px",
-          }}
-          src={nftToBuy?.metadata?.image}
-          alt="IMAGE"
-        />
-      </Modal>
+      {getMarketItem(nftToBuy) ? (
+        <Modal
+          title={`Buy ${nftToBuy?.name || "NFT"}`}
+          visible={visible}
+          onCancel={() => setVisibility(false)}
+          onOk={handleConfirmBuyToken}
+          confirmLoading={isPending}
+          okText="Buy"
+        >
+          <div style={{ width: "250px", margin: "auto" }}>
+            <Badge.Ribbon
+              text={`${getMarketItem(nftToBuy).price} ${nativeNetworkName}`}
+              color="green"
+            >
+              <img
+                style={{
+                  width: "250px",
+                  margin: "auto",
+                  borderRadius: "10px",
+                  marginBottom: "15px",
+                }}
+                src={nftToBuy?.metadata?.image}
+                alt="IMAGE"
+              />
+            </Badge.Ribbon>
+          </div>
+        </Modal>
+      ) : (
+        <Modal
+          title={`Buy ${nftToBuy?.name || "NFT"}`}
+          visible={visible}
+          onCancel={() => setVisibility(false)}
+          onOk={() => setVisibility(false)}
+          confirmLoading={isPending}
+          okText="Ok"
+        >
+          <img
+            style={{
+              width: "250px",
+              margin: "auto",
+              borderRadius: "10px",
+              marginBottom: "15px",
+            }}
+            src={nftToBuy?.metadata?.image}
+            alt="IMAGE"
+          />
+          <Alert message="This NFT is currently not for sale" type="warning" />
+        </Modal>
+      )}
     </>
   );
 }
 
-export default NFTTokenIds;
+export default NFTExplore;
